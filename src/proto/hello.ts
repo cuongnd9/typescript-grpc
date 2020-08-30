@@ -6,7 +6,7 @@ export interface HelloRequest {
   name: string;
 }
 
-export interface HelloReply {
+export interface HelloResponse {
   message: string;
 }
 
@@ -14,19 +14,19 @@ const baseHelloRequest: object = {
   name: "",
 };
 
-const baseHelloReply: object = {
+const baseHelloResponse: object = {
   message: "",
 };
 
-export interface Greeter {
+export interface GreeterService {
 
-  SayHello(request: HelloRequest): Promise<HelloReply>;
+  sayHello(request: HelloRequest): Promise<HelloResponse>;
 
-  SayHi(request: HelloRequest): Promise<HelloReply>;
+  sayHi(request: HelloRequest): Promise<HelloResponse>;
 
 }
 
-export class GreeterClientImpl implements Greeter {
+export class GreeterServiceClientImpl implements GreeterService {
 
   private readonly rpc: Rpc;
 
@@ -34,16 +34,16 @@ export class GreeterClientImpl implements Greeter {
     this.rpc = rpc;
   }
 
-  SayHello(request: HelloRequest): Promise<HelloReply> {
+  sayHello(request: HelloRequest): Promise<HelloResponse> {
     const data = HelloRequest.encode(request).finish();
-    const promise = this.rpc.request("helloworld.Greeter", "SayHello", data);
-    return promise.then(data => HelloReply.decode(new Reader(data)));
+    const promise = this.rpc.request("helloworld.GreeterService", "sayHello", data);
+    return promise.then(data => HelloResponse.decode(new Reader(data)));
   }
 
-  SayHi(request: HelloRequest): Promise<HelloReply> {
+  sayHi(request: HelloRequest): Promise<HelloResponse> {
     const data = HelloRequest.encode(request).finish();
-    const promise = this.rpc.request("helloworld.Greeter", "SayHi", data);
-    return promise.then(data => HelloReply.decode(new Reader(data)));
+    const promise = this.rpc.request("helloworld.GreeterService", "sayHi", data);
+    return promise.then(data => HelloResponse.decode(new Reader(data)));
   }
 
 }
@@ -101,15 +101,15 @@ export const HelloRequest = {
   },
 };
 
-export const HelloReply = {
-  encode(message: HelloReply, writer: Writer = Writer.create()): Writer {
+export const HelloResponse = {
+  encode(message: HelloResponse, writer: Writer = Writer.create()): Writer {
     writer.uint32(10).string(message.message);
     return writer;
   },
-  decode(input: Uint8Array | Reader, length?: number): HelloReply {
+  decode(input: Uint8Array | Reader, length?: number): HelloResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseHelloReply } as HelloReply;
+    const message = { ...baseHelloResponse } as HelloResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -123,8 +123,8 @@ export const HelloReply = {
     }
     return message;
   },
-  fromJSON(object: any): HelloReply {
-    const message = { ...baseHelloReply } as HelloReply;
+  fromJSON(object: any): HelloResponse {
+    const message = { ...baseHelloResponse } as HelloResponse;
     if (object.message !== undefined && object.message !== null) {
       message.message = String(object.message);
     } else {
@@ -132,8 +132,8 @@ export const HelloReply = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<HelloReply>): HelloReply {
-    const message = { ...baseHelloReply } as HelloReply;
+  fromPartial(object: DeepPartial<HelloResponse>): HelloResponse {
+    const message = { ...baseHelloResponse } as HelloResponse;
     if (object.message !== undefined && object.message !== null) {
       message.message = object.message;
     } else {
@@ -141,7 +141,7 @@ export const HelloReply = {
     }
     return message;
   },
-  toJSON(message: HelloReply): unknown {
+  toJSON(message: HelloResponse): unknown {
     const obj: any = {};
     obj.message = message.message || "";
     return obj;
